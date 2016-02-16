@@ -1,0 +1,5 @@
+var url = require('url')
+var date = new Date(url.parse('/api/parsetime?iso=2013-08-10T12:10:15.474Z ', true).query.iso)
+console.log({"hours":date.getHours()})
+console.log(url.parse('/api/parsetime?iso=2013-08-10T12:10:15.474Z ', true).path)
+console.log(typeof url.parse('/api/parsetime?iso=2013-08-10T12:10:15.474Z ', true).path)
