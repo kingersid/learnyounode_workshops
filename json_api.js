@@ -1,18 +1,36 @@
+var http = require('http')
 var url = require('url')
-var http = new require('http')
 
+function parsetime (time) {
+  return {
+    hour: time.getHours(),
+    minute: time.getMinutes(),
+    second: time.getSeconds()
+  }
+}
 
-var server = http.createServer(function(request,response){
-	if (url.parse(request.url).pathname === '/api/parsetime' )
-		dated = new Date(url.parse(request.url,true).query.iso)
-		response_object = {"hour":dated.getHours(),"minute":dated.getMinutes(),"second":dated.getSeconds()}
-		response.write(JSON.stringify(response_object))
-	if (url.parse(request.url).pathname === '/api/unixtime' )
-		dated = new Date(url.parse(request.url,true).query.iso)
-		response_object = {"unixtime":dated.getTime()}
-		response.write(JSON.stringify(response_object))
-});
+function unixtime (time) {
+  return { unixtime : time.getTime() }
+}
 
-server.listen(process.argv[2])
+var server = http.createServer(function (req, res) {
+  var parsedUrl = url.parse(req.url, true)
+  var time = new Date(parsedUrl.query.iso)
+  var result
+
+  if (/^\/api\/parsetime/.test(req.url))
+    result = parsetime(time)
+  else if (/^\/api\/unixtime/.test(req.url))
+    result = unixtime(time)
+
+  if (result) {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify(result))
+  } else {
+    res.writeHead(404)
+    res.end()
+  }
+})
+server.listen(Number(process.argv[2]))
 
 
